@@ -1,0 +1,27 @@
+{% extends "auth_base.html" %}
+{% load static %}
+
+{% block content %}
+<main class="main-content col" style="margin-top: 13%;">
+  <div class="main-content-container container-fluid px-4 my-auto h-100">
+    <div class="row no-gutters h-100">
+      <div class="col-lg-3 col-md-5 auth-form mx-auto my-auto">
+        <div class="card">
+          <div class="card-body">
+            <img class="auth-form__logo d-table mx-auto mb-3" src="{% static 'images/hms_logo/logo.ico' %}" alt="Shards Dashboards - Register Template">
+            <h5 class="auth-form__title text-center mb-4">Create an Account</h5>
+            <form method="POST" action="{% url 'account_signup' %}">
+              {% csrf_token %}
+              {{ form.as_p }}
+              <button type="submit" class="btn btn-pill btn-accent d-table mx-auto">Sign Up</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+</div>
+</div>
+</body>
+{% endblock %}
