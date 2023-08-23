@@ -2,6 +2,18 @@
 <form method="post">
   {% csrf_token %}
   {{ form.as_p }}
-  <button type="submit">Submit</button>
+  
+  <div>
+    <button type="submit">Submit</button>
+    
+    {% if has_previous %}
+      <button type="submit" name="navigate" value="first">First</button>
+      <button type="submit" name="navigate" value="previous">Previous</button>
+    {% endif %}
+    
+    {% if has_next %}
+      <button type="submit" name="navigate" value="next">Next</button>
+      <button type="submit" name="navigate" value="last">Last</button>
+    {% endif %}
+  </div>
 </form>
-
