@@ -1,0 +1,27 @@
+{% extends 'auth_base.html' %}
+
+{% block content %}
+    <h2>Files</h2>
+    {% for data_frame in data_frames %}
+        <a href="{% url 'generate_form' data_frame.name %}">Generate Form</a>
+        <h3>{{ data_frame.columns|join:', ' }}</h3>
+        <table class="table table-striped custom-table">
+            <thead>
+                <tr>
+                    {% for column in data_frame.data_frame.columns %}
+                        <th>{{ column }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for index, row in data_frame.data_frame.iterrows %}
+                    <tr>
+                        {% for value in row %}
+                            <td>{{ value }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endfor %}
+{% endblock %}
