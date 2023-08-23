@@ -6,22 +6,44 @@
     {% for data_frame in data_frames %}
         <h3>{{ data_frame.columns|join:', ' }}</h3>
         <table class="table table-striped custom-table">
-            <!-- Render table here -->
+            <thead>
+                <tr>
+                    {% for column in data_frame.columns %}
+                        <th>{{ column }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for index, row in data_frame.iterrows %}
+                    <tr>
+                        {% for value in row %}
+                            <td>{{ value }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
         </table>
-
-        <form method="post" action="{% url 'appbuilder:display_forms' %}">
-            {% csrf_token %}
-            <input type="hidden" name="data_frame_index" value="{{ forloop.counter0 }}">
-            <button type="submit">View Form</button>
-        </form>
-
-        <!-- Display dynamic form fields -->
-        {% if selected_data_frame is data_frame %}
-            <form method="post">
-                {% csrf_token %}
-                {{ dynamic_form.as_p }}
-                <button type="submit">Submit Form</button>
-            </form>
-        {% endif %}
     {% endfor %}
+
+    
 {% endblock %}
+
+<style>
+    
+    .custom-table {
+        width: 100%;
+        border-collapse: collapse;
+        border: 1px solid #ddd;
+    }
+
+    .custom-table th, .custom-table td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+
+    .custom-table th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+    }
+</style>

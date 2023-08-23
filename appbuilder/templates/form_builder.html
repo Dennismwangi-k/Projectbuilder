@@ -1,13 +1,7 @@
-<!-- form_builder/create_template.html -->
+<!-- generate_form.html -->
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Submit</button>
+</form>
 
-{% extends 'base.html' %}
-
-{% block content %}
-  <h2>Create Form Template</h2>
-  <form method="post">
-    {% csrf_token %}
-    <input type="text" name="name" placeholder="Template Name" required>
-    <textarea name="fields" placeholder="Field Definitions JSON" required></textarea>
-    <button type="submit">Create Template</button>
-  </form>
-{% endblock %}
