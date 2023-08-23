@@ -12,7 +12,7 @@ def upload_files(request):
         if form.is_valid():
             for file in request.FILES.getlist('files'):
                 UploadedFile.objects.create(name=file.name, file=file)
-            return redirect('appbuilder:display')
+            return redirect('display')
     else:
         form = UploadFileForm()
     return render(request, 'upload.html', {'form': form})
