@@ -7,6 +7,7 @@ urlpatterns = [
     path('upload/', views.upload_files, name='upload_files'),
     path('display/', views.display_files, name='display'),
     path('generate_form/<str:table_name>/', views.generate_form, name='generate_form'),
+    path('query/', views.query_by_columns, name='query_by_columns')
    
 ]
 
