@@ -10,6 +10,9 @@ import networkx as nx
 from django.conf import settings
 data_frames = []
 
+def home(request):
+    return render(request, 'dashboard.html')
+
 def load_data_frames():
     print("load_data_frames called")
     global data_frames
@@ -135,20 +138,26 @@ def query_by_columns(request):
         column_names = request.POST.get('column_names')
         column_list = [col.strip() for col in column_names.split(',')]
         
-        found_tables = []
+        merged_data = None
         load_data_frames()
 
-        for df_entry in data_frames:
-            df = df_entry.get('data_frame')
-            if not isinstance(df, pd.DataFrame):
-                continue  
-            if all(col in df.columns for col in column_list):
-                subset_data = df[column_list]
-                found_tables.append({'name': df_entry['name'], 'data': subset_data})
-        
-        return render(request, 'query_columns.html', {'found_tables': found_tables})
+        for col in column_list:
+            for df_entry in data_frames:
+                df = df_entry.get('data_frame')
+                if not isinstance(df, pd.DataFrame):
+                    continue  
+                if col in df.columns:
+                    subset_data = df[[col]]
+                    if merged_data is None:
+                        merged_data = subset_data.copy()
+                    else:
+                        merged_data = pd.merge(merged_data, subset_data, left_index=True, right_index=True, how='outer')
+
+
+        return render(request, 'query_columns.html', {'merged_data': merged_data})
     
     return render(request, 'query_columns.html')
+
 
 
 

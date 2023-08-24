@@ -9,30 +9,26 @@
   <input type="submit" value="Search">
 </form>
 
-{% if found_tables %}
-  <h2>Tables containing the columns:</h2>
-  <ul>
-  {% for data_frame in found_tables %}
-      <li>{{ data_frame.name }}</li>
-      <table class="table table-striped custom-table">
-        <thead>
+{% if merged_data is not None and not merged_data.empty %}
+
+  <h2>Merged Data:</h2>
+  <table class="table table-striped custom-table">
+    <thead>
+        <tr>
+            {% for column in merged_data.columns %}
+                <th>{{ column }}</th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for index, row in merged_data.iterrows %}
             <tr>
-                {% for column in data_frame.data.columns %}
-                    <th>{{ column }}</th>
+                {% for value in row %}
+                    <td>{{ value }}</td>
                 {% endfor %}
             </tr>
-        </thead>
-        <tbody>
-            {% for index, row in data_frame.data.iterrows %}
-                <tr>
-                    {% for value in row %}
-                        <td>{{ value }}</td>
-                    {% endfor %}
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-  {% endfor %}
-  </ul>
+        {% endfor %}
+    </tbody>
+  </table>
 {% endif %}
 {% endblock %}
