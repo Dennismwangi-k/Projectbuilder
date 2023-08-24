@@ -157,6 +157,37 @@ def query_by_columns(request):
     return render(request, 'query_columns.html')
 
 
+def find_relationships(data_frames):
+    relationships = []
+
+    # Compare each table's columns with every other table's columns
+    for i in range(len(data_frames)):
+        for j in range(i+1, len(data_frames)):
+            df1 = data_frames[i]['data_frame']
+            df2 = data_frames[j]['data_frame']
+
+            # Ensure both df1 and df2 are valid DataFrames
+            if not isinstance(df1, pd.DataFrame) or not isinstance(df2, pd.DataFrame):
+                continue
+
+            common_columns = set(df1.columns).intersection(df2.columns)
+            for col in common_columns:
+                relationships.append({
+                    'table1': data_frames[i]['name'],
+                    'table2': data_frames[j]['name'],
+                    'column': col
+                })
+    return relationships
+
+
+def display_relationships(request):
+    load_data_frames()
+
+    # Identify relationships
+    relationships = find_relationships(data_frames)
+
+    return render(request, 'display_relationships.html', {'relationships': relationships})
+
 
 
 
