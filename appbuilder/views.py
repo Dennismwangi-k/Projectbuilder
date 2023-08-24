@@ -127,3 +127,67 @@ def login(request):
 
 def signup(request):
     return render(request, "appbuilder/signup.html")
+
+
+from django.http import HttpResponse
+
+
+from django.http import HttpResponse
+
+def query_by_columns(request):
+    if request.method == 'POST':
+        column_names = request.POST.get('column_names')
+        column_list = [col.strip() for col in column_names.split(',')]
+        
+        found_tables = []
+        
+        # Load data frames (you can optimize this by using a global cache or similar)
+        load_data_frames()
+
+        for df_entry in data_frames:
+            df = df_entry.get('data_frame')
+            if not isinstance(df, pd.DataFrame):
+                continue  # Skip entries that don't have a valid DataFrame
+            if all(col in df.columns for col in column_list):
+                subset_data = df[column_list]
+                found_tables.append({'name': df_entry['name'], 'data': subset_data})
+        
+        return render(request, 'query_columns.html', {'found_tables': found_tables})
+    
+    return render(request, 'query_columns.html')
+
+
+def find_relationships(data_frames):
+    relationships = []
+
+    # Compare each table's columns with every other table's columns
+    for i in range(len(data_frames)):
+        for j in range(i+1, len(data_frames)):
+            df1 = data_frames[i]['data_frame']
+            df2 = data_frames[j]['data_frame']
+
+            # Ensure both df1 and df2 are valid DataFrames
+            if not isinstance(df1, pd.DataFrame) or not isinstance(df2, pd.DataFrame):
+                continue
+
+            common_columns = set(df1.columns).intersection(df2.columns)
+            for col in common_columns:
+                relationships.append({
+                    'table1': data_frames[i]['name'],
+                    'table2': data_frames[j]['name'],
+                    'column': col
+                })
+    return relationships
+
+
+def display_relationships(request):
+    load_data_frames()
+
+    # Identify relationships
+    relationships = find_relationships(data_frames)
+
+    return render(request, 'display_relationships.html', {'relationships': relationships})
+
+
+
+

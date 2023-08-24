@@ -1,0 +1,27 @@
+{% extends "auth_base.html" %}
+
+{% block content %}
+<h1>Table Relationships</h1>
+
+<table border="1">
+    <thead>
+        <tr>
+            <th>Table 1</th>
+            <th>Table 2</th>
+            <th>Common Column</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for rel in relationships %}
+    <tr style="background-color: {% cycle 'lightblue' 'lightyellow' %}">
+
+
+            <td>{{ rel.table1 }}</td>
+            <td>{{ rel.table2 }}</td>
+            <td>{{ rel.column }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

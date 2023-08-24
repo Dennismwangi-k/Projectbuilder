@@ -1,0 +1,38 @@
+{% extends 'auth_base.html' %}
+
+{% block content %}
+
+<form method="post">
+  {% csrf_token %}
+  <label for="column_names">Enter column names (comma-separated):</label>
+  <input type="text" id="column_names" name="column_names">
+  <input type="submit" value="Search">
+</form>
+
+{% if found_tables %}
+  <h2>Tables containing the columns:</h2>
+  <ul>
+  {% for data_frame in found_tables %}
+      <li>{{ data_frame.name }}</li>
+      <table class="table table-striped custom-table">
+        <thead>
+            <tr>
+                {% for column in data_frame.data.columns %}
+                    <th>{{ column }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for index, row in data_frame.data.iterrows %}
+                <tr>
+                    {% for value in row %}
+                        <td>{{ value }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+  {% endfor %}
+  </ul>
+{% endif %}
+{% endblock %}
