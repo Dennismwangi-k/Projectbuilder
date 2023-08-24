@@ -5,12 +5,18 @@ import pandas as pd
 import os
 import openpyxl
 from django import forms
-
-# data_frame_utils.py
+import matplotlib.pyplot as plt
+import networkx as nx
+from django.conf import settings
 data_frames = []
 
+def home(request):
+    return render(request, 'dashboard.html')
+
 def load_data_frames():
+    print("load_data_frames called")
     global data_frames
+    data_frames = []
     uploaded_files = UploadedFile.objects.all()
     for file in uploaded_files:
         try:
@@ -40,8 +46,9 @@ def upload_files(request):
     else:
         form = UploadFileForm()
     return render(request, 'upload.html', {'form': form})
-# views.py
+
 def display_files(request):
+    print("display_files view called")
     load_data_frames()
     uploaded_files = UploadedFile.objects.all()
     data_frames = []
@@ -81,7 +88,7 @@ class DynamicTableForm(forms.Form):
         for column in selected_data_frame.columns:
             self.fields[column] = forms.CharField(initial=selected_data_frame[column].iloc[0])
 
-# views.py
+
 def generate_form(request, table_name):
     selected_data_frame = None
     for entry in data_frames:
@@ -116,9 +123,6 @@ def generate_form(request, table_name):
     return render(request, 'form_builder.html', {'form': form, 'has_previous': has_previous, 'has_next': has_next})
 
 
-
-
-
 def custom_home_view(request):
     return redirect('account_login')
 
@@ -129,64 +133,73 @@ def signup(request):
     return render(request, "appbuilder/signup.html")
 
 
-from django.http import HttpResponse
-
-
-from django.http import HttpResponse
-
 def query_by_columns(request):
     if request.method == 'POST':
         column_names = request.POST.get('column_names')
         column_list = [col.strip() for col in column_names.split(',')]
         
-        found_tables = []
-        
-        # Load data frames (you can optimize this by using a global cache or similar)
+        merged_data = None
         load_data_frames()
 
-        for df_entry in data_frames:
-            df = df_entry.get('data_frame')
-            if not isinstance(df, pd.DataFrame):
-                continue  # Skip entries that don't have a valid DataFrame
-            if all(col in df.columns for col in column_list):
-                subset_data = df[column_list]
-                found_tables.append({'name': df_entry['name'], 'data': subset_data})
-        
-        return render(request, 'query_columns.html', {'found_tables': found_tables})
+        for col in column_list:
+            for df_entry in data_frames:
+                df = df_entry.get('data_frame')
+                if not isinstance(df, pd.DataFrame):
+                    continue  
+                if col in df.columns:
+                    subset_data = df[[col]]
+                    if merged_data is None:
+                        merged_data = subset_data.copy()
+                    else:
+                        merged_data = pd.merge(merged_data, subset_data, left_index=True, right_index=True, how='outer')
+
+
+        return render(request, 'query_columns.html', {'merged_data': merged_data})
     
     return render(request, 'query_columns.html')
 
 
-def find_relationships(data_frames):
-    relationships = []
 
-    # Compare each table's columns with every other table's columns
+
+def find_relationships(data_frames):
+    G = nx.Graph()
+    
+    for df_info in data_frames:
+        G.add_node(df_info['name'], columns=list(df_info['data_frame'].columns))
+
     for i in range(len(data_frames)):
         for j in range(i+1, len(data_frames)):
             df1 = data_frames[i]['data_frame']
             df2 = data_frames[j]['data_frame']
 
-            # Ensure both df1 and df2 are valid DataFrames
-            if not isinstance(df1, pd.DataFrame) or not isinstance(df2, pd.DataFrame):
-                continue
-
             common_columns = set(df1.columns).intersection(df2.columns)
             for col in common_columns:
-                relationships.append({
-                    'table1': data_frames[i]['name'],
-                    'table2': data_frames[j]['name'],
-                    'column': col
-                })
-    return relationships
+                G.add_edge(data_frames[i]['name'], data_frames[j]['name'], column=col)
+
+    return G
 
 
 def display_relationships(request):
     load_data_frames()
 
-    # Identify relationships
-    relationships = find_relationships(data_frames)
+    G = find_relationships(data_frames)
+    nodes_data = [(node, data) for node, data in G.nodes(data=True)]
 
-    return render(request, 'display_relationships.html', {'relationships': relationships})
+    plt.figure(figsize=(12, 8))
+    pos = nx.spring_layout(G)
+    nx.draw(G, pos, with_labels=True, node_size=3000, node_color="lightblue", font_size=15)
+    edge_labels = nx.get_edge_attributes(G, 'column')
+    nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
+    graph_path = os.path.join(settings.BASE_DIR, 'appbuilder', 'static', 'appbuilder', 'images', 'graph.png')
+    os.makedirs(os.path.dirname(graph_path), exist_ok=True)
+    
+    plt.savefig(graph_path, format="PNG")
+    return render(request, 'display_relationships.html', {
+        'graph_path': '/static/appbuilder/images/graph.png',
+        'nodes_data': nodes_data
+    })
+
+
 
 
 

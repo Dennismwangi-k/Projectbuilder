@@ -1,4 +1,7 @@
 <!-- generate_form.html -->
+{% extends 'auth_base.html' %}
+
+{% block content %}
 <form method="post">
   {% csrf_token %}
   {{ form.as_p }}
@@ -17,3 +20,4 @@
     {% endif %}
   </div>
 </form>
+{% endblock %}

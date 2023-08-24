@@ -1,0 +1,57 @@
+
+{% extends 'auth_base.html' %}
+
+{% block content %}
+    <!-- Body -->
+    <div class="body-container">
+        <!-- Column 1 -->
+        <div class="column column-1">
+            <button><i class="fas fa-box-open"></i> Application</button>
+            <button><i class="fas fa-database"></i> Data</button>
+            <button><i class="fas fa-folder-open"></i> Directories</button>
+            <button><i class="fas fa-file-alt"></i> Document template</button>
+            <button><i class="fas fa-book"></i> Logs</button>
+        </div>
+        
+        <!-- Column 2 -->
+        <div class="column column-2">
+            <div class="header">
+                <h2>Application</h2>
+                <div>
+                    <button>All assets</button>
+                    <button>Create app</button>
+                </div>
+            </div>
+            <div class="apps-list">
+                <!-- Apps will be added here dynamically -->
+            </div>
+        </div>
+        
+        <!-- Column 3 -->
+        <div class="column column-3">
+            <h2>Helpful Resources</h2>
+            <button><i class="fas fa-play-circle"></i> Get Started</button>
+            <button><i class="fas fa-question"></i> Online Help</button>
+            <button><i class="fas fa-chalkboard-teacher"></i> Online Training</button>
+            <button><i class="fas fa-book-open"></i> Tutorials</button>
+            <button><i class="fas fa-film"></i> Video Library</button>
+            <button><i class="fas fa-briefcase"></i> Project Consultation</button>
+            <button><i class="fas fa-users"></i> Community Forum</button>
+            <button><i class="fas fa-layer-group"></i> App Templates</button>
+            <button><i class="fas fa-phone"></i> Contact Support</button>
+            <button><i class="fas fa-lightbulb"></i> Suggest a Feature</button>
+            <button><i class="fas fa-blog"></i> Caspio Blog</button>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal">
+        <div class="modal-content">
+            <h3>Create App</h3>
+            <input type="text" placeholder="App Name">
+            <button>Save</button>
+        </div>
+    </div>
+
+   
+{% endblock %}
