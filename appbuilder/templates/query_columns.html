@@ -1,34 +1,49 @@
-{% extends 'auth_base.html' %}
+{% extends 'base.html' %}
 
 {% block content %}
-
-<form method="post">
-  {% csrf_token %}
-  <label for="column_names">Enter column names (comma-separated):</label>
-  <input type="text" id="column_names" name="column_names">
-  <input type="submit" value="Search">
-</form>
-
-{% if merged_data is not None and not merged_data.empty %}
-
-  <h2>Merged Data:</h2>
-  <table class="table table-striped custom-table">
-    <thead>
-        <tr>
-            {% for column in merged_data.columns %}
-                <th>{{ column }}</th>
-            {% endfor %}
-        </tr>
-    </thead>
-    <tbody>
-        {% for index, row in merged_data.iterrows %}
-            <tr>
-                {% for value in row %}
-                    <td>{{ value }}</td>
-                {% endfor %}
-            </tr>
-        {% endfor %}
-    </tbody>
-  </table>
-{% endif %}
+    <!-- Body -->
+    <div class="body-container">
+        <!-- Column 1 -->
+        {% include 'column1.html'  %}
+        
+        <!-- Column 2 -->
+        <div class="column column-2">
+            <form method="post">
+                {% csrf_token %}
+                <label for="column_names">Enter column names (comma-separated):</label>
+                <input type="text" id="column_names" name="column_names">
+                <input type="submit" value="Search">
+              </form>
+              
+              {% if merged_data is not None and not merged_data.empty %}
+              
+                <h2>Merged Data:</h2>
+                <table class="table table-striped custom-table">
+                  <thead>
+                      <tr>
+                          {% for column in merged_data.columns %}
+                              <th>{{ column }}</th>
+                          {% endfor %}
+                      </tr>
+                  </thead>
+                  <tbody>
+                      {% for index, row in merged_data.iterrows %}
+                          <tr>
+                              {% for value in row %}
+                                  <td>{{ value }}</td>
+                              {% endfor %}
+                          </tr>
+                      {% endfor %}
+                  </tbody>
+                </table>
+              {% endif %}
+        </div>
+        
+        {% include 'column3.html'  %}
+    </div>   
 {% endblock %}
+
+
+
+
+

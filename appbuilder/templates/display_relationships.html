@@ -1,20 +1,32 @@
-{% extends "auth_base.html" %}
-
+{% extends 'base.html' %}
 {% block content %}
-<h1>Table Relationships</h1>
+    <div class="body-container">
+        {% include 'column1.html'  %}
+        <div class="column column-2">
+            <h1>Table Relationships</h1>
 
-<img src="{{ graph_path }}" alt="Graph of relationships" style="width:50%; float:left;">
+                <img src="{{ graph_path }}" alt="Graph of relationships" style="width:50%; float:left;">
 
-<div style="width:50%; float:right;">
-    {% for node, data in nodes_data %}
-        <h3>{{ node }}</h3>
-        <ul>
-        {% for column in data.columns %}
-            <li>{{ column }}</li>
-        {% endfor %}
-        </ul>
-    {% endfor %}
-</div>
+                <div style="width:50%; float:right;">
+                    {% for node, data in nodes_data %}
+                        <h3>{{ node }}</h3>
+                        <ul>
+                        {% for column in data.columns %}
+                            <li>{{ column }}</li>
+                        {% endfor %}
+                        </ul>
+                    {% endfor %}
+                </div>
 
-<div style="clear:both;"></div>
+                <div style="clear:both;"></div>
+        </div>
+        {% include 'column3.html'  %}
+    </div>
+
+   
 {% endblock %}
+
+
+
+
+

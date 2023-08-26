@@ -1,8 +1,8 @@
-{% extends "auth_base.html" %}
+{% extends "base.html" %}
 {% load static %}
 {% block content %}
 <!-- End Main Sidebar -->
-          <main class="main-content col" style=" margin-top: 13%;">
+          <main class="main-content col" style=" margin-top: 5%;">
           <div class="main-content-container container-fluid px-4 my-auto h-100">
             <div class="row no-gutters h-100">
               <div class="col-lg-3 col-md-5 auth-form mx-auto my-auto">
@@ -26,6 +26,7 @@
                 </div>
                 <div class="auth-form__meta d-flex mt-4">
                   <a class="button secondaryAction" href="{% url 'account_reset_password' %}">Forgot Password</a>
+                  <a class="ml-auto" href="{% url 'account_signup' %}">Create new account?</a>
                 </div>
                 <div>
                   {% if form.errors %}
