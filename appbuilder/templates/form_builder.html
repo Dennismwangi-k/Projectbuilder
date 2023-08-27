@@ -1,23 +1,60 @@
-<!-- generate_form.html -->
-{% extends 'auth_base.html' %}
+{% extends 'base.html' %}
 
 {% block content %}
-<form method="post">
-  {% csrf_token %}
-  {{ form.as_p }}
-  
-  <div>
-    <button type="submit">Submit</button>
+
+    <div class="body-container">
+
+        {% include 'column1.html'  %}
+
+        <div class="column column-2">
+          <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            
+            <div class="button-container">
+              <button type="submit" >Submit</button>
+              
+              {% if has_previous %}
+              <div class="grid-row" style="margin-left: -100%!important;">
+                  <button type="submit" name="navigate" value="first">First</button>
+                  <button type="submit" name="navigate" value="previous">Previous</button>
+              </div>
+              {% endif %}
+              
+              {% if has_next %}
+              <div class="grid-row" style="margin-left: -150%!important;">
+                  <button type="submit" name="navigate" value="next">Next</button>
+                  <button type="submit" name="navigate" value="last">Last</button>
+              </div>
+              {% endif %}
+          </div>
+          
+          </form>
+        </div>
+        
+        
+        {% include 'column3.html'  %}
+    </div>  
     
-    {% if has_previous %}
-      <button type="submit" name="navigate" value="first">First</button>
-      <button type="submit" name="navigate" value="previous">Previous</button>
-    {% endif %}
-    
-    {% if has_next %}
-      <button type="submit" name="navigate" value="next">Next</button>
-      <button type="submit" name="navigate" value="last">Last</button>
-    {% endif %}
-  </div>
-</form>
+    <style>
+      .button-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); 
+    gap: 10px; 
+    justify-items: center; 
+}
+
+.grid-row {
+    display: grid;
+    grid-auto-flow: column;
+    gap: 10px; 
+    justify-content: center; 
+}
+
+    </style>
 {% endblock %}
+
+
+
+
+

@@ -198,9 +198,3 @@ def display_relationships(request):
         'graph_path': '/static/appbuilder/images/graph.png',
         'nodes_data': nodes_data
     })
-
-
-
-
-
-
