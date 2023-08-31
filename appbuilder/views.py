@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
-from .forms import UploadFileForm
-from .models import UploadedFile
+from .forms import UploadFileForm,DatabaseImportForm
+from .models import UploadedFile, ImportedTable
 import pandas as pd
 import os
 import openpyxl
@@ -9,6 +9,33 @@ import matplotlib.pyplot as plt
 import networkx as nx
 from django.conf import settings
 data_frames = []
+
+def import_success(request):
+    return render(request, 'import_success.html')
+
+def import_database(request):
+    if request.method == 'POST':
+        form = DatabaseImportForm(request.POST, request.FILES)
+        if form.is_valid():
+            uploaded_file = request.FILES['database_file']
+            # Process uploaded_file, extract data using pandas
+            data = pd.read_excel(uploaded_file, engine='openpyxl')  # Specify the engine
+            # data = pd.read_excel(uploaded_file, engine='openpyxl')
+
+
+            # Save data to ImportedTable model
+            for index, row in data.iterrows():
+                imported_item = ImportedTable(field1=row['field1'], field2=row['field2'])
+                imported_item.save()
+
+            return redirect('import_success')  # Redirect to a success page
+    else:
+        form = DatabaseImportForm()
+
+    return render(request, 'import_database.html', {'form': form})
+
+
+
 
 def home(request):
     return render(request, 'dashboard.html')
@@ -130,7 +157,7 @@ def login(request):
     return render(request, "appbuilder/login.html")
 
 def signup(request):
-    return render(request, "appbuilder/signup.html")
+    return render(request, "signup.html")
 
 
 def query_by_columns(request):
@@ -197,4 +224,4 @@ def display_relationships(request):
     return render(request, 'display_relationships.html', {
         'graph_path': '/static/appbuilder/images/graph.png',
         'nodes_data': nodes_data
-    })
+    })     
