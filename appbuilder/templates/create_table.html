@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+{% block  content %}
+    <div class="body-container">
+        {% include 'column1.html'  %}
+        <div class="column column-2">
+            <div class="row">
+                <div class="col">
+                    <h3>Create Table</h3>
+                </div>
+                <div class="col">
+                    <button type="button" id="add-column">Add Column</button>
+                    
+                </div>
+            </div>
+            
+            <form action="{% url 'create_dynamic_table' %}" method="POST">
+                {% csrf_token %}
+                <label for="table_name">Table Name:</label>
+                <input type="text" id="table_name" name="table_name" required class="w-50">
+                <table>
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Column Name</th>
+                            <th>Data Type</th>
+                            <th>Unique</th>
+                            <th>Label</th>
+                        </tr>
+                    </thead>
+                    <tbody id="columns">
+                        <!-- Default row -->
+                        <tr>
+                            <td></td>
+                            <td><input type="text" name="column_name" placeholder="Column Name" required></td>
+                            <td>
+                                <select name="data_type" required>
+                                    <option value="text">Text</option>
+                                    <option value="number">Number</option>
+                                    <option value="datetime">Datetime</option>
+                                    <option value="date">Currency</option>
+                                    <option value="yes/no">Yes/No</option>
+                                    <option value="file">File</option>
+                                    <option value="password">Password</option>
+                                    <option value="timestamp">TimeStamp</option>
+                                    <option value="random_id">Random ID</option>
+                                    <option value="autonumber">Autonumber</option>
+
+                                </select>
+                            </td>
+                            <td><input type="checkbox" name="default_unique"></td>
+                            <td><input type="text" name="default_label"></td>
+                            <td class="edit-icon"></td>
+                        </tr>
+                        <!-- Dynamically added rows will go here -->
+                    </tbody>
+                </table>
+                <div class="button-container">
+                    <button type="submit">Save</button>
+                </div>    
+                
+            </form>
+            </div>
+        {% include 'column3.html'  %}
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const columnContainer = document.getElementById("columns");
+            const addColumnButton = document.getElementById("add-column");
+            let columnCount = 0;
+        
+            addColumnButton.addEventListener("click", function() {
+                columnCount++;
+        
+                // Clone the original row
+                const originalRow = columnContainer.querySelector("tr");
+                const newRow = originalRow.cloneNode(true);
+        
+                // Update the names of the form inputs
+                newRow.querySelectorAll("input, select").forEach(function(input) {
+                    input.name = input.name.replace("_1", `_${columnCount}`);
+                    if (input.type === "text" && input.hasAttribute("placeholder")) {
+                        input.value = ""; // Clear input values
+                    }
+                });
+        
+                columnContainer.appendChild(newRow);
+            });
+        });
+        
+        
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 6px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h3 {
+            text-align: center;
+        }
+
+        .button-container {
+            text-align: right;
+        }
+
+        .button-container button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .button-container button:hover {
+            background-color: #0056b3;
+        }
+        .edit-icon {
+            display: none;
+            cursor: pointer;
+        }
+        input{
+            border:none;
+        }
+        select{
+            border:none;
+        }
+        input:focus{
+            border:none;
+            outline:none;
+        }
+        select:focus{
+            border:none;
+            outline:none;
+        }
+        td {
+            position: relative;
+        }
+    
+        td select,input{
+            width: 100%;
+            box-sizing: border-box;
+            padding: 4px; /* Adjust padding as needed */
+            margin: 0; /* Remove default margin */
+        }
+    </style>
+
+{% endblock  %}

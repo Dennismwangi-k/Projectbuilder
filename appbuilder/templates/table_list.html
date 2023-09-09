@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% block  content %}
+    <div class="body-container">
+
+        {% include 'column1.html'  %}
+        <div class="column column-2">
+            <div class="row">
+                <h3>List of Table Names</h3>
+            </div>
+            <div class="tables">
+
+                <ul class="ml-0" style="list-style:none;">
+                    {% for table_name in table_names %}
+                    <li style="font-size:18px;"><i class="fas fa-folder"></i>
+                        {{ table_name }}
+                        <br><a href="{% url 'view_table' table_name=table_name %}">View Table</a>
+                    </li>
+                        {% empty %}
+                    <li>No tables created yet.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% include 'column3.html' %}
+    </div>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 6px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h3 {
+            text-align: center;
+        }
+
+        .button-container {
+            text-align: right;
+        }
+
+        .button-container button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .button-container button:hover {
+            background-color: #0056b3;
+        }
+        .edit-icon {
+            display: none;
+            cursor: pointer;
+        }
+        .row{
+            width:100%;
+        }
+        li{
+            border-bottom:1px black;
+            padding:10px;
+            border: 2px black;
+        }
+
+
+    </style>
+
+{% endblock  %}
+

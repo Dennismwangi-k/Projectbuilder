@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% block  content %}
+    <title>View Table - {{ table_name }}</title>
+    <div class="body-container">
+        {% include 'column1.html'  %}
+        <div class="column column-2">
+            <div class="row">
+                <h3>{{ table_name }} Table</h3>
+            </div>
+            <div class="tables">
+                <table>
+                    <thead>
+                            {% for column in columns %}
+                            <th>{{ column }}</th>
+                            {% endfor %}
+                    </thead>
+                    <tbody>
+                        {% for data_row in table_data %}
+                        <tr>
+                            {% for row in columns %}
+                            <td>{{ row.columns }}</td>
+                            {% endfor %}
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="{{ columns|length }}">No data available.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% include 'column3.html' %}
+    </div>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 6px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h3 {
+            text-align: center;
+        }
+
+        .button-container {
+            text-align: right;
+        }
+
+        .button-container button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .button-container button:hover {
+            background-color: #0056b3;
+        }
+        .edit-icon {
+            display: none;
+            cursor: pointer;
+        }
+        .row{
+            width:100%;
+        }
+
+
+
+    </style>
+
+{% endblock  %}
+

@@ -1,6 +1,8 @@
-from django.shortcuts import render, redirect
+from django.apps import apps
+from django.shortcuts import render, redirect, reverse
+from django.db import connection, IntegrityError
 from .forms import UploadFileForm,DatabaseImportForm
-from .models import UploadedFile, ImportedTable
+from .models import UploadedFile, ImportedTable, DynamicTable
 import pandas as pd
 import os
 import openpyxl
@@ -8,6 +10,7 @@ from django import forms
 import matplotlib.pyplot as plt
 import networkx as nx
 from django.conf import settings
+from django.contrib import messages
 data_frames = []
 
 def import_success(request):
@@ -225,3 +228,70 @@ def display_relationships(request):
         'graph_path': '/static/appbuilder/images/graph.png',
         'nodes_data': nodes_data
     })     
+
+# creating table
+def create_table(request):
+    return render(request, 'create_table.html')
+
+
+def successful_table(request):
+    return render(request, 'success_table.html')
+
+def error_table_creation(request):
+    return render(request, 'table_error.html')
+
+
+def create_dynamic_table(request):
+    if request.method == 'POST':
+        table_name = request.POST.get('table_name')
+        columns = request.POST.getlist('column_name')
+        data_types = request.POST.getlist('data_type')
+
+        # Create a new table with the provided name
+        cursor = connection.cursor()
+        try:
+            # CREATING TABLE IN DATABASE ENGINE
+            cursor.execute(f'CREATE TABLE {table_name} (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT);')
+
+            # Add columns to the table
+            for column_name, data_type in zip(columns, data_types):
+                cursor.execute(f'ALTER TABLE {table_name} ADD COLUMN {column_name} {data_type};')
+
+            # Create a record in the DynamicTable model to store information about the created table
+            dynamic_table = DynamicTable(table_name=table_name)
+            dynamic_table.save()
+
+            # Redirect to a success page after creation
+            return redirect('sucess')
+
+        except IntegrityError:
+            connection.rollback()
+            return render(request, 'table_error.html', {'error_message': 'Table name already exists'})
+
+        except Exception as e:
+            connection.rollback()
+            return render(request, 'table_error.html', {'error_message': str(e)})
+
+    return render(request, 'create_table.html')
+
+
+# getting the table list
+def list_tables(request):
+    table_names = DynamicTable.objects.values_list('table_name', flat=True)
+    return render(request, 'table_list.html', {'table_names': table_names})
+
+# function to view table
+def view_table(request, table_name):
+    try:
+        dynamic_table = DynamicTable.objects.get(table_name=table_name)
+        model = apps.get_model(app_label='appbuilder', model_name='DynamicTable')
+
+        table_data = model.objects.all()
+        columns = [field.name for field in model._meta.get_fields() if field.name != 'id']
+        return render(request, 'view_table.html',
+                      {'table_name': table_name, 'columns': columns,
+                       'table_data': table_data})
+
+    except DynamicTable.DoesNotExist:
+        # Handle the case where the table doesn't exist
+        return render(request, 'table_not_found.html')
