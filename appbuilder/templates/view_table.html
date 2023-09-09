@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block  content %}
+{% block content %}
     <title>View Table - {{ table_name }}</title>
     <div class="body-container">
         {% include 'column1.html'  %}
@@ -7,28 +7,39 @@
             <div class="row">
                 <h3>{{ table_name }} Table</h3>
             </div>
-            <div class="tables">
-                <table>
-                    <thead>
-                            {% for column in columns %}
-                            <th>{{ column }}</th>
-                            {% endfor %}
-                    </thead>
-                    <tbody>
-                        {% for data_row in table_data %}
-                        <tr>
-                            {% for row in columns %}
-                            <td>{{ row.columns }}</td>
-                            {% endfor %}
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="{{ columns|length }}">No data available.</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+            <!-- Modify your HTML template -->
+<div class="button-container">
+    <button id="add-row-button">Add Row</button>
+    <!-- <button id="save-button">Save</button> -->
+</div>
+<form method="post" id="save-form">
+    {% csrf_token %}
+<div class="tables">
+    <table>
+        <thead>
+            {% for column in columns %}
+                <th>{{ column }}</th>
+            {% endfor %}
+        </thead>
+        <tbody>
+            {% for data_row in table_data %}
+                <tr>
+                    {% for value in data_row %}
+                        <td>{{ value }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+            <tr id="new-row-template" style="display: none;">
+                {% for column in columns %}
+                    <td><input type="text" name="{{ column }}" placeholder="Enter {{ column }}" required></td>
+                {% endfor %}
+            </tr>
+        </tbody>
+    </table>
+</div>
+<button type="submit" id="save-button">Save</button>
+</form>
+
         </div>
         {% include 'column3.html' %}
     </div>
@@ -91,5 +102,121 @@
 
     </style>
 
-{% endblock  %}
+<!-- <script>
+    // Modify your JavaScript code
+document.addEventListener('DOMContentLoaded', function () {
+    const addRowButton = document.getElementById('add-row-button');
+    const saveButton = document.getElementById('save-button');
+    const newRowTemplate = document.getElementById('new-row-template');
+    const tbody = document.querySelector('tbody');
+
+    addRowButton.addEventListener('click', function () {
+        const newRow = newRowTemplate.cloneNode(true);
+        newRow.removeAttribute('id');
+        newRow.style.display = 'table-row';
+        tbody.appendChild(newRow);
+    });
+
+    saveButton.addEventListener('click', function () {
+        // Handle saving the input fields here
+        const formData = new FormData();
+        const inputFields = document.querySelectorAll('input[type="text"]');
+        inputFields.forEach((input) => {
+            formData.append(input.name, input.value);
+        });
+
+        // You can send the formData to the server using AJAX or Django form submission
+        // Example using fetch API:
+        fetch('/view_myTables/{{ table_name }}/', {
+            method: 'POST',
+            body: formData,
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Handle the server response
+            console.log(data);
+            inputFields.forEach((input) => {
+                input.value = ''; // Clear input fields
+            });
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    });
+});
+
+</script> -->
+<script>
+    // Modify your JavaScript code
+document.addEventListener('DOMContentLoaded', function () {
+    const addRowButton = document.getElementById('add-row-button');
+    const saveButton = document.getElementById('save-button');
+    const newRowTemplate = document.getElementById('new-row-template');
+    const tbody = document.querySelector('tbody');
+
+    // Get the CSRF token from the cookie
+    const csrftoken = getCookie('csrftoken');
+
+    addRowButton.addEventListener('click', function () {
+        const newRow = newRowTemplate.cloneNode(true);
+        newRow.removeAttribute('id');
+        newRow.style.display = 'table-row';
+        tbody.appendChild(newRow);
+    });
+
+    saveButton.addEventListener('click', function () {
+        // Handle saving the input fields here
+        const formData = new FormData();
+        const inputFields = document.querySelectorAll('input[type="text"]');
+        inputFields.forEach((input) => {
+            formData.append(input.name, input.value);
+        });
+
+        // Include the CSRF token in the headers
+        const headers = {
+            'X-CSRFToken': csrftoken
+        };
+
+        // You can send the formData to the server using AJAX or Django form submission
+        // Example using fetch API:
+        fetch('/view_myTables/{{ table_name }}/', {
+            method: 'POST',
+            body: formData,
+            headers: headers // Include CSRF token in the headers
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Handle the server response
+            console.log(data);
+            inputFields.forEach((input) => {
+                input.value = ''; // Clear input fields
+            });
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    });
+
+    // Function to get the CSRF token from the cookie
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+});
+
+</script>
+
+</body>
+</html>
+{% endblock %}
 

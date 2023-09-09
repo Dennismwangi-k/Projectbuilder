@@ -280,18 +280,42 @@ def list_tables(request):
     table_names = DynamicTable.objects.values_list('table_name', flat=True)
     return render(request, 'table_list.html', {'table_names': table_names})
 
-# function to view table
+
+
+from django.shortcuts import render
+from django.http import HttpResponse, JsonResponse
+from django.db import connection
+
 def view_table(request, table_name):
     try:
-        dynamic_table = DynamicTable.objects.get(table_name=table_name)
-        model = apps.get_model(app_label='appbuilder', model_name='DynamicTable')
+        # Fetch data from the specified table
+        with connection.cursor() as cursor:
+            cursor.execute(f"SELECT * FROM {table_name};")
+            table_data = cursor.fetchall()
+            columns = [column[0] for column in cursor.description]
 
-        table_data = model.objects.all()
-        columns = [field.name for field in model._meta.get_fields() if field.name != 'id']
-        return render(request, 'view_table.html',
-                      {'table_name': table_name, 'columns': columns,
-                       'table_data': table_data})
+        if request.method == 'POST':
+            # Handle saving data from the input fields
+            data_to_save = {}
+            for column in columns:
+                value = request.POST.get(column)
+                if value:
+                    data_to_save[column] = value
 
-    except DynamicTable.DoesNotExist:
-        # Handle the case where the table doesn't exist
-        return render(request, 'table_not_found.html')
+            if data_to_save:
+                # Build an INSERT query and execute it to save the data
+                columns_str = ', '.join(data_to_save.keys())
+                values_str = ', '.join(['%s'] * len(data_to_save))
+                query = f"INSERT INTO {table_name} ({columns_str}) VALUES ({values_str});"
+
+                with connection.cursor() as cursor:
+                    cursor.execute(query, list(data_to_save.values()))
+
+                return JsonResponse({'message': 'Data saved successfully'})
+
+        return render(request, 'view_table.html', {'table_name': table_name, 'columns': columns, 'table_data': table_data})
+
+    except Exception as e:
+        # Handle exceptions or errors as needed
+        return HttpResponse(f"Error: {str(e)}")
+
