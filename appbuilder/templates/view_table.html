@@ -102,50 +102,7 @@
 
     </style>
 
-<!-- <script>
-    // Modify your JavaScript code
-document.addEventListener('DOMContentLoaded', function () {
-    const addRowButton = document.getElementById('add-row-button');
-    const saveButton = document.getElementById('save-button');
-    const newRowTemplate = document.getElementById('new-row-template');
-    const tbody = document.querySelector('tbody');
 
-    addRowButton.addEventListener('click', function () {
-        const newRow = newRowTemplate.cloneNode(true);
-        newRow.removeAttribute('id');
-        newRow.style.display = 'table-row';
-        tbody.appendChild(newRow);
-    });
-
-    saveButton.addEventListener('click', function () {
-        // Handle saving the input fields here
-        const formData = new FormData();
-        const inputFields = document.querySelectorAll('input[type="text"]');
-        inputFields.forEach((input) => {
-            formData.append(input.name, input.value);
-        });
-
-        // You can send the formData to the server using AJAX or Django form submission
-        // Example using fetch API:
-        fetch('/view_myTables/{{ table_name }}/', {
-            method: 'POST',
-            body: formData,
-        })
-        .then(response => response.json())
-        .then(data => {
-            // Handle the server response
-            console.log(data);
-            inputFields.forEach((input) => {
-                input.value = ''; // Clear input fields
-            });
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
-    });
-});
-
-</script> -->
 <script>
     // Modify your JavaScript code
 document.addEventListener('DOMContentLoaded', function () {
@@ -191,6 +148,7 @@ document.addEventListener('DOMContentLoaded', function () {
             inputFields.forEach((input) => {
                 input.value = ''; // Clear input fields
             });
+            window.location.reload();
         })
         .catch(error => {
             console.error('Error:', error);
