@@ -11,6 +11,9 @@ import matplotlib.pyplot as plt
 import networkx as nx
 from django.conf import settings
 from django.contrib import messages
+from django.shortcuts import render
+from django.http import HttpResponse, JsonResponse
+from django.db import connection
 data_frames = []
 
 def import_success(request):
@@ -275,27 +278,19 @@ def create_dynamic_table(request):
     return render(request, 'create_table.html')
 
 
-# getting the table list
 def list_tables(request):
     table_names = DynamicTable.objects.values_list('table_name', flat=True)
     return render(request, 'table_list.html', {'table_names': table_names})
 
 
-
-from django.shortcuts import render
-from django.http import HttpResponse, JsonResponse
-from django.db import connection
-
 def view_table(request, table_name):
     try:
-        # Fetch data from the specified table
         with connection.cursor() as cursor:
             cursor.execute(f"SELECT * FROM {table_name};")
             table_data = cursor.fetchall()
             columns = [column[0] for column in cursor.description]
 
         if request.method == 'POST':
-            # Handle saving data from the input fields
             data_to_save = {}
             for column in columns:
                 value = request.POST.get(column)
@@ -303,7 +298,6 @@ def view_table(request, table_name):
                     data_to_save[column] = value
 
             if data_to_save:
-                # Build an INSERT query and execute it to save the data
                 columns_str = ', '.join(data_to_save.keys())
                 values_str = ', '.join(['%s'] * len(data_to_save))
                 query = f"INSERT INTO {table_name} ({columns_str}) VALUES ({values_str});"
@@ -316,6 +310,5 @@ def view_table(request, table_name):
         return render(request, 'view_table.html', {'table_name': table_name, 'columns': columns, 'table_data': table_data})
 
     except Exception as e:
-        # Handle exceptions or errors as needed
         return HttpResponse(f"Error: {str(e)}")
 
