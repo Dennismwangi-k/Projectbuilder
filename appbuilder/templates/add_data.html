@@ -1,0 +1,45 @@
+{% load custom_filters %}
+
+
+
+<!-- add_data.html -->
+<h1>Add Data to {{ table.name }}</h1>
+<form method="POST">
+    {% csrf_token %}
+    <table>
+        <thead>
+            <tr>
+                {% for column in table.column_set.all %}
+                    <th>{{ column.name }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                {% for column in table.column_set.all %}
+                    <td><input type="text" name="data_{{ column.id }}" required></td>
+                {% endfor %}
+            </tr>
+        </tbody>
+    </table>
+    <button type="submit">Add Data</button>
+</form>
+<h2>Data:</h2>
+<table>
+    <thead>
+        <tr>
+            {% for column in table.column_set.all %}
+                <th>{{ column.name }}</th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in data %}
+            <tr>
+                {% for column in table.column_set.all %}
+                    <td>{{ item|get_data_by_column:column }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>

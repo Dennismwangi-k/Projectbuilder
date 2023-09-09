@@ -1,0 +1,9 @@
+<!-- list_tables.html -->
+<h1>List of Tables</h1>
+<ul>
+    {% for table in tables %}
+        <li>
+            <a href="{% url 'add_data' table_id=table.id %}">{{ table.name }}</a>
+        </li>
+    {% endfor %}
+</ul>

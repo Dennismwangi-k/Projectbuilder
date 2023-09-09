@@ -28,5 +28,8 @@ class ImportedTable(models.Model):
 # Create Dynamictable here
 class DynamicTable(models.Model):
     table_name = models.CharField(max_length=255, unique=True)
+    
+
+    ''''''
 
 
