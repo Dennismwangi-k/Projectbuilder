@@ -17,5 +17,7 @@ urlpatterns = [
     path('table_creation_error/', views.error_table_creation, name='error'),
     path('display/tables/', views.list_tables, name='tables'),
     path('view_myTables/<str:table_name>/', views.view_table, name='view_table'),
+    path('select_tables/', views.view_relationships, name='select_tables'),
+    path('save_relationship_ajax/', views.save_relationship_via_ajax, name='save_relationship_via_ajax'),
 ]
 

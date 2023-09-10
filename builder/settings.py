@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'appbuilder.apps.AppbuilderConfig',
     'allauth',
     'allauth.account',
+    'django_extensions',
+    'widget_tweaks',
 ]
 
 MIDDLEWARE = [
