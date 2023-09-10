@@ -17,19 +17,26 @@ class User(AbstractUser):
 
 
 class ImportedTable(models.Model):
-    # Define fields that match the columns in your imported database
     field1 = models.CharField(max_length=100)
     field2 = models.IntegerField()
-    # ... other fields
-
     class Meta:
         verbose_name_plural = "Imported Tables"
 
-# Create Dynamictable here
 class DynamicTable(models.Model):
     table_name = models.CharField(max_length=255, unique=True)
     
 
-    ''''''
+class TableRelationship(models.Model):
+    table1 = models.CharField(max_length=200,default='')
+    column1 = models.CharField(max_length=200,default='')
+    table2 = models.CharField(max_length=200,default='')
+    column2 = models.CharField(max_length=200,default='')
+    RELATIONSHIP_CHOICES = (
+        ('M2M', 'Many to Many'),
+        ('O2O', 'One to One'),
+        ('FK', 'Foreign Key'),
+    )
+    relationship_type = models.CharField(choices=RELATIONSHIP_CHOICES, max_length=3,default='')
+
 
 

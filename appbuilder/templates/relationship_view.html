@@ -1,0 +1,13 @@
+<h2>Selected Tables:</h2>
+<ul>
+    {% for table in selected_tables %}
+        <li>{{ table }}</li>
+    {% endfor %}
+</ul>
+
+<h2>Relationships:</h2>
+<ul>
+    {% for relationship in relationships %}
+        <li>{{ relationship.0 }} -&gt; {{ relationship.1 }} (Foreign Key to {{ relationship.2 }})</li>
+    {% endfor %}
+</ul>

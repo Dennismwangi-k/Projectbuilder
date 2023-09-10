@@ -1,5 +1,5 @@
 # forms.py
-
+from .models import TableRelationship
 from django import forms
 
 
@@ -23,4 +23,12 @@ class DatabaseImportForm(forms.Form):
     username = forms.CharField(max_length=100, required=False)
     password = forms.CharField(widget=forms.PasswordInput, required=False)
 
+
+
+
+
+class TableRelationshipForm(forms.ModelForm):
+    class Meta:
+        model = TableRelationship
+        fields = ['table1', 'column1', 'table2', 'column2', 'relationship_type']
 

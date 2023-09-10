@@ -2,7 +2,7 @@ from django.apps import apps
 from django.shortcuts import render, redirect, reverse
 from django.db import connection, IntegrityError
 from .forms import UploadFileForm,DatabaseImportForm
-from .models import UploadedFile, ImportedTable, DynamicTable
+from .models import UploadedFile, ImportedTable, DynamicTable,TableRelationship
 import pandas as pd
 import os
 import openpyxl
@@ -14,6 +14,10 @@ from django.contrib import messages
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from django.db import connection
+from django.shortcuts import render
+from .forms import  TableRelationshipForm  
+from django.db import connections
+
 data_frames = []
 
 def import_success(request):
@@ -232,7 +236,6 @@ def display_relationships(request):
         'nodes_data': nodes_data
     })     
 
-# creating table
 def create_table(request):
     return render(request, 'create_table.html')
 
@@ -250,21 +253,16 @@ def create_dynamic_table(request):
         columns = request.POST.getlist('column_name')
         data_types = request.POST.getlist('data_type')
 
-        # Create a new table with the provided name
         cursor = connection.cursor()
         try:
-            # CREATING TABLE IN DATABASE ENGINE
+        
             cursor.execute(f'CREATE TABLE {table_name} (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT);')
 
-            # Add columns to the table
             for column_name, data_type in zip(columns, data_types):
                 cursor.execute(f'ALTER TABLE {table_name} ADD COLUMN {column_name} {data_type};')
 
-            # Create a record in the DynamicTable model to store information about the created table
             dynamic_table = DynamicTable(table_name=table_name)
             dynamic_table.save()
-
-            # Redirect to a success page after creation
             return redirect('sucess')
 
         except IntegrityError:
@@ -311,4 +309,63 @@ def view_table(request, table_name):
 
     except Exception as e:
         return HttpResponse(f"Error: {str(e)}")
+
+
+
+def get_table_data(database_alias='default'):
+    table_data = {}
+    with connections[database_alias].cursor() as cursor:
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
+        for row in cursor.fetchall():
+            table_name = row[0]
+            cursor.execute(f"PRAGMA table_info({table_name})")
+            columns = [column[1] for column in cursor.fetchall()]
+            table_data[table_name] = columns
+    return table_data
+
+def view_relationships(request):
+    form = TableRelationshipForm()  
+    relationships = TableRelationship.objects.all()
+    
+    if request.method == 'POST':
+        form = TableRelationshipForm(request.POST)
+        if form.is_valid():
+            table1 = form.cleaned_data['table1']
+            column1 = form.cleaned_data['column1']
+            table2 = form.cleaned_data['table2']
+            column2 = form.cleaned_data['column2']
+            relationship_type = form.cleaned_data['relationship_type']
+
+           
+            rel = TableRelationship(table1=table1, column1=column1, table2=table2, column2=column2, relationship_type=relationship_type)
+            rel.save()
+
+    table_data = get_table_data()
+    context = {
+        'form': form,
+        'table_data': table_data,  
+        'relationships': relationships
+    }
+
+    return render(request, 'table_selection.html', context)
+
+
+def save_relationship_via_ajax(request):
+    if request.method == 'POST':
+        form = TableRelationshipForm(request.POST)
+        if form.is_valid():
+            table1 = form.cleaned_data['table1']
+            column1 = form.cleaned_data['column1']
+            table2 = form.cleaned_data['table2']
+            column2 = form.cleaned_data['column2']
+            relationship_type = form.cleaned_data['relationship_type']
+            rel = TableRelationship(table1=table1, column1=column1, table2=table2, column2=column2, relationship_type=relationship_type)
+            rel.save()
+            return JsonResponse({'success': True, 'message': 'Relationship saved successfully!'})
+        
+        else:
+            errors = {field: error_list[0] for field, error_list in form.errors.items()}
+            return JsonResponse({'success': False, 'message': 'Invalid form data.', 'errors': errors})
+
+    return JsonResponse({'success': False, 'message': 'Invalid request method.'})
 
